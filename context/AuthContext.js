@@ -56,7 +56,8 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const isAdmin = dbUser?.role === 'admin' || user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL;
+  const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'auladdevops@gmail.com';
+  const isAdmin = user?.email === ADMIN_EMAIL && dbUser?.role === 'admin' || user?.email === 'auladdevops@gmail.com';
 
   return (
     <AuthContext.Provider value={{ user, dbUser, loading, loginWithGoogle, logout, isAdmin }}>

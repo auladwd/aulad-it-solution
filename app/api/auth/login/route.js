@@ -14,20 +14,23 @@ export async function POST(request) {
     // Find or create user
     let user = await User.findOne({ email });
 
+    const ADMIN_EMAIL = process.env.NEXT_PUBLIC_ADMIN_EMAIL || 'auladdevops@gmail.com';
+    const isSoleAdmin = email === ADMIN_EMAIL || email === 'auladdevops@gmail.com';
+
     if (!user) {
-      const adminEmail = process.env.NEXT_PUBLIC_ADMIN_EMAIL;
       user = await User.create({
         name,
         email,
         image,
         firebaseUid,
-        role: email === adminEmail ? 'admin' : 'user',
+        role: isSoleAdmin ? 'admin' : 'user',
       });
     } else {
       // Update existing user info
       user.name = name || user.name;
       user.image = image || user.image;
       user.firebaseUid = firebaseUid || user.firebaseUid;
+      user.role = isSoleAdmin ? 'admin' : 'user';
       await user.save();
     }
 
