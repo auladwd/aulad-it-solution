@@ -9,7 +9,7 @@ import {
   FiHome, FiPackage, FiShoppingCart, FiUsers, FiFileText,
   FiStar, FiMenu, FiX, FiTrendingUp, FiCheck, FiClock,
   FiAlertCircle, FiDollarSign, FiActivity, FiRefreshCw,
-  FiExternalLink, FiPlus, FiArrowUpRight, FiFilter, FiLayers
+  FiExternalLink, FiPlus, FiArrowUpRight, FiFilter, FiLayers, FiImage
 } from 'react-icons/fi';
 import { HiSparkles } from 'react-icons/hi2';
 import {
@@ -28,10 +28,12 @@ import {
 const NAV_ITEMS = [
   { href: '/admin', label: 'ড্যাশবোর্ড', icon: <FiHome /> },
   { href: '/admin/services', label: 'সার্ভিস', icon: <FiPackage /> },
+  { href: '/admin/categories', label: 'ক্যাটাগরি', icon: <FiLayers /> },
   { href: '/admin/orders', label: 'অর্ডার', icon: <FiShoppingCart /> },
   { href: '/admin/users', label: 'ব্যবহারকারী', icon: <FiUsers /> },
   { href: '/admin/blog', label: 'ব্লগ', icon: <FiFileText /> },
   { href: '/admin/testimonials', label: 'মতামত', icon: <FiStar /> },
+  { href: '/admin/media', label: 'মিডিয়া গ্যালারি', icon: <FiImage /> },
 ];
 
 const CAT_COLORS = {

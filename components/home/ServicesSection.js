@@ -11,6 +11,7 @@ const CATEGORIES = ['all','school','college','madrasa','clinic','hospital','groc
 export default function ServicesSection({ limit = 6 }) {
   const { t, lang } = useLanguage();
   const [services, setServices]       = useState([]);
+  const [categories, setCategories]   = useState([]);
   const [loading, setLoading]         = useState(true);
   const [activeCategory, setActive]   = useState('all');
 
@@ -21,6 +22,21 @@ export default function ServicesSection({ limit = 6 }) {
     emptyTitle: 'No Services Yet',
     emptyDesc: 'Add services via the Admin Panel.',
   };
+
+  useEffect(() => {
+    let ignore = false;
+    axios.get('/api/categories')
+      .then(res => {
+        if (!ignore && res.data.categories?.length) {
+          setCategories(res.data.categories);
+        }
+      })
+      .catch(console.error);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     const fetch = async () => {
@@ -51,12 +67,33 @@ export default function ServicesSection({ limit = 6 }) {
 
         {/* Category Filters */}
         <div className="filter-pills-wrap" style={{ display:'flex', flexWrap:'wrap', justifyContent:'center', gap:8, marginBottom:40 }}>
-          {CATEGORIES.map(cat => (
-            <button key={cat} onClick={() => setActive(cat)}
-              className={`filter-pill${activeCategory === cat ? ' active' : ''}`}>
-              {t.categories?.[cat] || cat}
-            </button>
-          ))}
+          <button
+            onClick={() => setActive('all')}
+            className={`filter-pill${activeCategory === 'all' ? ' active' : ''}`}
+          >
+            ✦ {lang === 'bn' ? 'সব সার্ভিস' : 'All Services'}
+          </button>
+          {categories.length > 0 ? (
+            categories.map(cat => {
+              const label = lang === 'bn' && cat.nameBn ? cat.nameBn : cat.name;
+              return (
+                <button
+                  key={cat.slug}
+                  onClick={() => setActive(cat.slug)}
+                  className={`filter-pill${activeCategory === cat.slug ? ' active' : ''}`}
+                >
+                  {cat.icon ? `${cat.icon} ` : ''}{label}
+                </button>
+              );
+            })
+          ) : (
+            ['school','college','madrasa','clinic','hospital','grocery','ecommerce','portfolio'].map(cat => (
+              <button key={cat} onClick={() => setActive(cat)}
+                className={`filter-pill${activeCategory === cat ? ' active' : ''}`}>
+                {t.categories?.[cat] || cat}
+              </button>
+            ))
+          )}
         </div>
 
         {/* Grid */}

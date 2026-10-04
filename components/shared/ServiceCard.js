@@ -16,7 +16,7 @@ const CAT_COLORS = {
 export default function ServiceCard({ service }) {
   const { lang, t } = useLanguage();
   const title = (lang === 'bn' && service.titleBn) ? service.titleBn : service.title;
-  const catLabel = t.categories?.[service.category] || CAT_LABELS[service.category] || service.category;
+  const catLabel = t.categories?.[service.category] || (service.category ? service.category.charAt(0).toUpperCase() + service.category.slice(1).replace(/-/g, ' ') : '');
   const catColor = CAT_COLORS[service.category] || '#7C3AED';
   const discount = service.originalPrice
     ? Math.round(((service.originalPrice - service.price) / service.originalPrice) * 100)

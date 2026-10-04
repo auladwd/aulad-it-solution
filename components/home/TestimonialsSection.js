@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { FiStar, FiChevronLeft, FiChevronRight } from 'react-icons/fi';
 import axios from 'axios';
+import Image from 'next/image';
 
 export default function TestimonialsSection() {
   const { t, lang } = useLanguage();
@@ -54,13 +55,19 @@ export default function TestimonialsSection() {
             </div>
             {/* Quote */}
             <p className="testimonial-quote" style={{ color:'#CBD5E1', fontSize:17, lineHeight:1.8, fontStyle:'italic', marginBottom:28 }}>
-              "{cur?.message}"
+              &ldquo;{cur?.message}&rdquo;
             </p>
             {/* Author */}
             <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:14 }}>
-              <div style={{ width:48, height:48, borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED,#22d3ee)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:700, fontSize:18 }}>
-                {cur?.name?.[0]}
-              </div>
+              {cur?.image ? (
+                <div style={{ position:'relative', width:48, height:48, borderRadius:'50%', overflow:'hidden', border:'2px solid rgba(159,103,255,0.4)', flexShrink:0 }}>
+                  <Image src={cur.image} alt={cur.name || 'Client'} fill style={{ objectFit:'cover' }} />
+                </div>
+              ) : (
+                <div style={{ width:48, height:48, borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED,#22d3ee)', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontWeight:700, fontSize:18, flexShrink:0 }}>
+                  {cur?.name?.[0]}
+                </div>
+              )}
               <div style={{ textAlign:'left' }}>
                 <p style={{ color:'#fff', fontWeight:700, fontSize:16 }}>{cur?.name}</p>
                 <p style={{ color:'#64748B', fontSize:13 }}>{cur?.designation} — {cur?.company}</p>

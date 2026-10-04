@@ -12,11 +12,27 @@ const CATEGORIES = [
 ];
 
 function ServicesContent() {
-  const { t } = useLanguage();
+  const { t, lang } = useLanguage();
   const searchParams = useSearchParams();
   const [services, setServices] = useState([]);
+  const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
   const [activeCategory, setActiveCategory] = useState(searchParams.get('category') || 'all');
+
+  useEffect(() => {
+    let ignore = false;
+    axios.get('/api/categories')
+      .then(res => {
+        if (!ignore && res.data.categories?.length) {
+          setCategories(res.data.categories);
+        }
+      })
+      .catch(console.error);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     const fetchServices = async () => {
@@ -38,15 +54,36 @@ function ServicesContent() {
     <>
       {/* Category Filter */}
       <div className="flex flex-wrap justify-center gap-2 mb-10">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`filter-pill ${activeCategory === cat ? 'active' : ''}`}
-          >
-            {t.categories[cat]}
-          </button>
-        ))}
+        <button
+          onClick={() => setActiveCategory('all')}
+          className={`filter-pill ${activeCategory === 'all' ? 'active' : ''}`}
+        >
+          ✦ {lang === 'bn' ? 'সব সার্ভিস' : 'All Services'}
+        </button>
+        {categories.length > 0 ? (
+          categories.map((cat) => {
+            const label = lang === 'bn' && cat.nameBn ? cat.nameBn : cat.name;
+            return (
+              <button
+                key={cat.slug}
+                onClick={() => setActiveCategory(cat.slug)}
+                className={`filter-pill ${activeCategory === cat.slug ? 'active' : ''}`}
+              >
+                {cat.icon ? `${cat.icon} ` : ''}{label}
+              </button>
+            );
+          })
+        ) : (
+          CATEGORIES.filter(c => c !== 'all').map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`filter-pill ${activeCategory === cat ? 'active' : ''}`}
+            >
+              {t.categories?.[cat] || cat}
+            </button>
+          ))
+        )}
       </div>
 
       {loading ? (

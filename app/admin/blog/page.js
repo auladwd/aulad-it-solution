@@ -5,6 +5,7 @@ import axios from 'axios';
 import toast from 'react-hot-toast';
 import { FiPlus, FiEdit, FiTrash2, FiCheck, FiX, FiEye } from 'react-icons/fi';
 import { format } from 'date-fns';
+import ImageUpload from '@/components/shared/ImageUpload';
 
 const EMPTY_FORM = {
   title: '', titleBn: '', slug: '', excerpt: '', excerptBn: '',
@@ -97,9 +98,14 @@ export default function AdminBlogPage() {
                 <label className="text-slate-400 text-sm mb-1 block">Slug *</label>
                 <input className="input-dark" value={form.slug} onChange={e => setForm({...form, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})} required />
               </div>
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">Thumbnail URL</label>
-                <input className="input-dark" value={form.thumbnail} onChange={e => setForm({...form, thumbnail: e.target.value})} placeholder="https://..." />
+              <div className="md:col-span-2">
+                <ImageUpload
+                  label="ব্লগ থাম্বনেইল ছবি (Cloudinary ও MongoDB)"
+                  value={form.thumbnail}
+                  onChange={(url) => setForm({ ...form, thumbnail: url })}
+                  folder="aulad-it-solution/blog"
+                  aspectRatio="video"
+                />
               </div>
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">ক্যাটাগরি</label>

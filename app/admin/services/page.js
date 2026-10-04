@@ -1,9 +1,11 @@
 'use client';
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { AdminLayout } from '@/app/admin/page';
 import axios from 'axios';
 import toast from 'react-hot-toast';
-import { FiPlus, FiEdit, FiTrash2, FiCheck, FiX, FiExternalLink } from 'react-icons/fi';
+import { FiPlus, FiEdit, FiTrash2, FiCheck, FiX, FiExternalLink, FiLayers } from 'react-icons/fi';
+import ImageUpload from '@/components/shared/ImageUpload';
 
 const CATEGORIES = ['school', 'college', 'madrasa', 'clinic', 'hospital', 'grocery', 'ecommerce', 'portfolio', 'other'];
 
@@ -15,6 +17,7 @@ const EMPTY_FORM = {
 
 export default function AdminServicesPage() {
   const [services, setServices] = useState([]);
+  const [categoryList, setCategoryList] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editId, setEditId] = useState(null);
@@ -23,12 +26,37 @@ export default function AdminServicesPage() {
 
   const fetchServices = async () => {
     setLoading(true);
-    const res = await axios.get('/api/services');
-    setServices(res.data.services);
-    setLoading(false);
+    try {
+      const res = await axios.get('/api/services');
+      setServices(res.data.services || []);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   };
 
-  useEffect(() => { fetchServices(); }, []);
+  useEffect(() => {
+    let ignore = false;
+    axios.get('/api/services')
+      .then(res => {
+        if (!ignore) setServices(res.data.services || []);
+      })
+      .catch(console.error)
+      .finally(() => {
+        if (!ignore) setLoading(false);
+      });
+
+    axios.get('/api/categories')
+      .then(res => {
+        if (!ignore) setCategoryList(res.data.categories || []);
+      })
+      .catch(console.error);
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -114,9 +142,25 @@ export default function AdminServicesPage() {
                 <input className="input-dark" value={form.slug} onChange={e => setForm({...form, slug: e.target.value.toLowerCase().replace(/\s+/g, '-')})} placeholder="school-website" required />
               </div>
               <div>
-                <label className="text-slate-400 text-sm mb-1 block">Category *</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-slate-400 text-sm block">Category *</label>
+                  <Link
+                    href="/admin/categories"
+                    className="text-cyan-400 hover:text-cyan-300 text-xs flex items-center gap-1 transition-colors"
+                  >
+                    <FiLayers size={12} /> + নতুন ক্যাটাগরি
+                  </Link>
+                </div>
                 <select className="input-dark" value={form.category} onChange={e => setForm({...form, category: e.target.value})}>
-                  {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
+                  {categoryList.length > 0 ? (
+                    categoryList.map(c => (
+                      <option key={c.slug} value={c.slug}>
+                        {c.icon || '🌐'} {c.nameBn} ({c.name})
+                      </option>
+                    ))
+                  ) : (
+                    CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)
+                  )}
                 </select>
               </div>
               <div>
@@ -131,9 +175,14 @@ export default function AdminServicesPage() {
                 <label className="text-slate-400 text-sm mb-1 block">ডেলিভারি (দিন)</label>
                 <input type="number" className="input-dark" value={form.deliveryDays} onChange={e => setForm({...form, deliveryDays: e.target.value})} />
               </div>
-              <div>
-                <label className="text-slate-400 text-sm mb-1 block">থাম্বনেইল URL</label>
-                <input className="input-dark" value={form.thumbnail} onChange={e => setForm({...form, thumbnail: e.target.value})} placeholder="https://..." />
+              <div className="md:col-span-2">
+                <ImageUpload
+                  label="সার্ভিস থাম্বনেইল ছবি (Cloudinary ও MongoDB)"
+                  value={form.thumbnail}
+                  onChange={(url) => setForm({ ...form, thumbnail: url })}
+                  folder="aulad-it-solution/services"
+                  aspectRatio="video"
+                />
               </div>
               <div>
                 <label className="text-slate-400 text-sm mb-1 block">Demo URL</label>
